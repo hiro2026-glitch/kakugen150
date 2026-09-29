@@ -1,0 +1,912 @@
+<title>「どれ読めばいいの？」今のあなたに刺さる言葉を診断</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EEEDE6;
+    --surface:#FBFAF6;
+    --surface-2:#E4E2D8;
+    --ink:#23221E;
+    --ink-soft:#665F52;
+    --accent:#253C4C;
+    --accent-contrast:#FBFAF6;
+    --seal:#7C3B44;
+    --seal-soft:#F0DEDF;
+    --border:#D9D6C8;
+    --shadow: 0 1px 2px rgba(35,34,30,.06), 0 10px 30px -12px rgba(35,34,30,.18);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#15171A;
+      --surface:#1E2124;
+      --surface-2:#262A2E;
+      --ink:#E7E4DA;
+      --ink-soft:#A9A69B;
+      --accent:#8FB7CC;
+      --accent-contrast:#101315;
+      --seal:#C97C86;
+      --seal-soft:#3A2529;
+      --border:#34383C;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 20px 40px -20px rgba(0,0,0,.6);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#15171A;
+    --surface:#1E2124;
+    --surface-2:#262A2E;
+    --ink:#E7E4DA;
+    --ink-soft:#A9A69B;
+    --accent:#8FB7CC;
+    --accent-contrast:#101315;
+    --seal:#C97C86;
+    --seal-soft:#3A2529;
+    --border:#34383C;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 20px 40px -20px rgba(0,0,0,.6);
+    color-scheme: dark;
+  }
+
+  *{ box-sizing:border-box; }
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",sans-serif;
+    padding-inline:20px;
+    min-height:100%;
+  }
+  .wrap{
+    max-width:640px;
+    margin:0 auto;
+    padding-block:36px 56px;
+    display:flex;
+    flex-direction:column;
+    min-height:100%;
+  }
+  .kicker{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:28px;
+  }
+  .kicker-label{
+    font-size:12.5px;
+    letter-spacing:.14em;
+    color:var(--ink-soft);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .kicker-label .dot{
+    width:7px;height:7px;border-radius:50%;
+    background:var(--seal);
+    flex:none;
+  }
+  .page-title{
+    font-family:"Shippori Mincho",serif;
+    font-size:26px;
+    font-weight:800;
+    line-height:1.55;
+    text-wrap:balance;
+    color:var(--ink);
+    margin:0 0 28px;
+  }
+  .page-title .soft{
+    display:block;
+    font-size:15px;
+    font-weight:500;
+    color:var(--ink-soft);
+    margin-top:6px;
+    letter-spacing:.02em;
+  }
+  .restart-link{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    background:none;
+    border:none;
+    cursor:pointer;
+    letter-spacing:.06em;
+    padding:4px 0;
+    font-family:inherit;
+    text-decoration:underline;
+    text-underline-offset:3px;
+    text-decoration-color:var(--border);
+  }
+  .restart-link:hover{ color:var(--ink); }
+
+  .stage{ flex:1; display:flex; flex-direction:column; }
+
+  /* --- progress --- */
+  .progress{
+    display:flex;
+    gap:6px;
+    margin-bottom:22px;
+  }
+  .progress i{
+    height:3px;
+    flex:1;
+    border-radius:2px;
+    background:var(--border);
+    overflow:hidden;
+    position:relative;
+  }
+  .progress i.done{ background:var(--accent); }
+  .progress i.current{ background:var(--border); }
+  .progress i.current::after{
+    content:"";
+    position:absolute; inset:0;
+    background:var(--accent);
+    width:45%;
+    animation:pulse 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{ transform:translateX(-10%); opacity:.6;}
+    50%{ transform:translateX(140%); opacity:1;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .progress i.current::after{ animation:none; opacity:.8; width:100%; transform:none; }
+  }
+
+  /* --- question card --- */
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:18px;
+    box-shadow:var(--shadow);
+    padding:36px 28px 30px;
+  }
+  .q-num{
+    font-size:12.5px;
+    letter-spacing:.12em;
+    color:var(--seal);
+    font-weight:700;
+    margin-bottom:14px;
+  }
+  .q-text{
+    font-family:"Shippori Mincho",serif;
+    font-size:24px;
+    font-weight:700;
+    line-height:1.65;
+    text-wrap:balance;
+    margin-bottom:30px;
+  }
+  .choices{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .choice-btn{
+    font-family:"Zen Kaku Gothic New",sans-serif;
+    font-size:16px;
+    font-weight:700;
+    padding:15px 18px;
+    border-radius:12px;
+    border:1.5px solid var(--border);
+    background:var(--surface);
+    color:var(--ink);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    transition:border-color .15s ease, background .15s ease, transform .1s ease;
+    text-align:left;
+    line-height:1.4;
+  }
+  .choice-btn .count{
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--ink-soft);
+    background:var(--surface-2);
+    border-radius:999px;
+    padding:3px 10px;
+    flex:none;
+    font-variant-numeric: tabular-nums;
+  }
+  .choice-btn:hover{ border-color:var(--accent); }
+  .choice-btn:hover .count{ color:var(--accent); }
+  .choice-btn:active{ transform:scale(.99); }
+  .choice-btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  .breadcrumb{
+    margin-bottom:16px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    line-height:1.7;
+  }
+  .breadcrumb b{ color:var(--ink); font-weight:700; }
+  .back-row{
+    margin-top:16px;
+    display:flex;
+    justify-content:flex-start;
+  }
+  .back-btn{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    background:none;
+    border:none;
+    cursor:pointer;
+    padding:4px 0;
+    font-family:inherit;
+    text-decoration:underline;
+    text-underline-offset:3px;
+    text-decoration-color:var(--border);
+  }
+  .back-btn:hover{ color:var(--ink); }
+
+  /* --- checkin (interstitial) --- */
+  .checkin-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:18px;
+    box-shadow:var(--shadow);
+    padding:32px 28px;
+    text-align:center;
+  }
+  .checkin-count{
+    font-family:"Shippori Mincho",serif;
+    font-size:44px;
+    font-weight:800;
+    color:var(--seal);
+    line-height:1;
+    font-variant-numeric: tabular-nums;
+  }
+  .checkin-count span{ font-size:18px; font-weight:700; margin-left:4px; }
+  .checkin-label{
+    margin-top:10px;
+    font-size:15px;
+    color:var(--ink-soft);
+    line-height:1.7;
+  }
+  .checkin-label b{ color:var(--ink); }
+  .checkin-actions{
+    margin-top:26px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .checkin-btn{
+    font-family:"Zen Kaku Gothic New",sans-serif;
+    font-size:15.5px;
+    font-weight:700;
+    padding:14px 20px;
+    border-radius:12px;
+    cursor:pointer;
+    border:1.5px solid var(--accent);
+  }
+  .checkin-btn.primary{ background:var(--accent); color:var(--accent-contrast); }
+  .checkin-btn.primary:hover{ filter:brightness(1.05); }
+  .checkin-btn.secondary{ background:transparent; color:var(--accent); }
+  .checkin-btn.secondary:hover{ background:var(--accent-soft, var(--surface-2)); }
+
+  /* --- result --- */
+  .result-head{
+    margin-bottom:22px;
+  }
+  .result-eyebrow{
+    font-size:12.5px;
+    letter-spacing:.12em;
+    color:var(--seal);
+    font-weight:700;
+    margin-bottom:10px;
+  }
+  .result-title{
+    font-family:"Shippori Mincho",serif;
+    font-size:30px;
+    font-weight:800;
+    line-height:1.4;
+    text-wrap:balance;
+    margin-bottom:12px;
+  }
+  .result-desc{
+    color:var(--ink-soft);
+    font-size:15px;
+    line-height:1.85;
+  }
+  .kagen-list{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin-top:26px;
+  }
+  .kagen-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:20px 20px 18px;
+    box-shadow:var(--shadow);
+  }
+  .kagen-num{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:12px;
+    font-weight:700;
+    color:var(--seal);
+    letter-spacing:.06em;
+    margin-bottom:10px;
+  }
+  .kagen-num::before{
+    content:"";
+    width:16px; height:16px;
+    border-radius:50%;
+    background:var(--seal-soft);
+    border:1px solid var(--seal);
+    flex:none;
+  }
+  .kagen-quote{
+    font-family:"Shippori Mincho",serif;
+    font-size:18px;
+    font-weight:700;
+    line-height:1.7;
+    margin-bottom:8px;
+    text-wrap:balance;
+  }
+  .kagen-rest{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    line-height:1.75;
+    margin-bottom:14px;
+  }
+  .result-count{
+    display:inline-block;
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--ink-soft);
+    background:var(--surface-2);
+    border-radius:999px;
+    padding:3px 12px;
+    margin-bottom:10px;
+  }
+  .kagen-links{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px 16px;
+    align-items:center;
+  }
+  .kagen-link{
+    font-size:13.5px;
+    font-weight:700;
+    color:var(--accent);
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    border-bottom:1.5px solid transparent;
+    padding-bottom:1px;
+  }
+  .kagen-link:hover{ border-bottom-color:var(--accent); }
+  .kagen-link.sub{ color:var(--ink-soft); font-weight:500; }
+  .kagen-link.sub:hover{ border-bottom-color:var(--ink-soft); }
+
+  .result-footer{
+    margin-top:30px;
+    padding-top:22px;
+    border-top:1px solid var(--border);
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:12px;
+  }
+  .restart-btn{
+    font-family:"Zen Kaku Gothic New",sans-serif;
+    font-size:14.5px;
+    font-weight:700;
+    padding:12px 22px;
+    border-radius:10px;
+    border:1.5px solid var(--accent);
+    background:transparent;
+    color:var(--accent);
+    cursor:pointer;
+  }
+  .restart-btn:hover{ background:var(--accent); color:var(--accent-contrast); }
+  .note-hint{
+    font-size:12px;
+    color:var(--ink-soft);
+    line-height:1.7;
+  }
+
+  [hidden]{ display:none !important; }
+</style>
+
+<div class="wrap">
+  <div class="kicker">
+    <span class="kicker-label"><span class="dot"></span>格言診断 ― 全150本対応</span>
+    <button class="restart-link" id="topRestart" hidden>はじめから</button>
+  </div>
+
+  <h1 class="page-title" id="pageTitle">150本の格言より、<span class="soft">「どれ読めばいいの？」今のあなたに刺さる言葉を診断</span></h1>
+
+  <div class="stage">
+    <!-- QUESTION VIEW -->
+    <div id="quizView">
+      <div class="breadcrumb" id="breadcrumb" hidden></div>
+      <div class="card">
+        <div class="q-num" id="qNum">質問 1</div>
+        <div class="q-text" id="qText"></div>
+        <div class="choices" id="choices"></div>
+      </div>
+      <div class="back-row" id="backRow" hidden>
+        <button class="back-btn" id="backBtn">← 一つ前の質問に戻る</button>
+      </div>
+    </div>
+
+    <!-- CHECKIN VIEW (shown after each answer, before deciding to narrow further) -->
+    <div id="checkinView" hidden>
+      <div class="breadcrumb" id="checkinBreadcrumb"></div>
+      <div class="checkin-card">
+        <div class="checkin-count"><span id="checkinNum">0</span><span>件</span></div>
+        <div class="checkin-label" id="checkinLabel"></div>
+        <div class="checkin-actions" id="checkinActions"></div>
+      </div>
+      <div class="back-row">
+        <button class="back-btn" id="checkinBackBtn">← 一つ前の質問に戻る</button>
+      </div>
+    </div>
+
+    <!-- RESULT VIEW -->
+    <div id="resultView" hidden>
+      <div class="result-head">
+        <div class="result-eyebrow">診断結果</div>
+        <div class="result-title" id="resultTitle"></div>
+        <div class="result-desc" id="resultDesc"></div>
+      </div>
+      <div class="kagen-list" id="kagenList"></div>
+      <div class="result-footer">
+        <button class="restart-btn" id="restartBtn">もう一度診断する</button>
+        <button class="back-btn" id="resultBackBtn">← 一つ前の質問に戻る</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+
+  var ITEMS = [
+    {n:1,quote:"「お金の器」の話。",rest:"なぜ私たちは、自分の認識以上の豊かさを手にできないのか？",link:"https://note.com/alert_hiro20/n/n61fbb6825a68",cat:"MONEY",sub:"MONEY1",sub2:""},
+    {n:2,quote:"「あなたが今いる場所は、あなたの思考の結果である。」",rest:"ジェームズ・アレン　内側の世界を変えれば、外側の現実は静かに動き始める。",link:"https://note.com/alert_hiro20/n/nde370a4c6ae8",cat:"MINDSET",sub:"M1",sub2:""},
+    {n:3,quote:"昨日の自分より少しでも成長していれば、それで十分だ。",rest:"武道の教え比較の矢印を「他者」から「昨日の自分」に向け直すだけで、人生の景色が変わる。",link:"https://note.com/alert_hiro20/n/n96b4f7350b7f",cat:"PERSIST",sub:"P2",sub2:""},
+    {n:4,quote:"貧しさは財布の中にあるのではなく、心の中にある。",rest:"ユダヤの格言　マインドセットが、あなたの「豊かさ」を決めている",link:"https://note.com/alert_hiro20/n/n7e53492e4aeb",cat:"MONEY",sub:"MONEY1",sub2:""},
+    {n:5,quote:"行動しなければ、どんな夢も妄想に過ぎない。",rest:"「わかっている」だけでは、何も動かない",link:"https://note.com/alert_hiro20/n/n92c6230f74ee",cat:"ACTION",sub:"A1b-i",sub2:"A1b-i"},
+    {n:6,quote:"「投資で最も重要なのは、頭の中にある知識だ。」",rest:"ウォーレン・バフェットお金より先に、頭に投資せよ。知識だけが、誰にも奪えない最強の資産になる。",link:"https://note.com/alert_hiro20/n/nb6c8bc02a07c",cat:"LEARNING",sub:"LEARNING1",sub2:""},
+    {n:7,quote:"「快適な場所に居続ける限り、人は成長できない。」",rest:"ネルソン・マンデラ不快感は、あなたが進化しているサインかもしれない。",link:"https://note.com/alert_hiro20/n/n5d517d340b2f",cat:"FEAR",sub:"F1",sub2:""},
+    {n:8,quote:"「問題はあなたを縛る鎖ではなく、新しい扉への鍵だ。」",rest:"禅の言葉── 行き詰まりを感じたとき、その「問題」こそがあなたの突破口かもしれない。",link:"https://note.com/alert_hiro20/n/na8605f3f5a72",cat:"MINDSET",sub:"M2a",sub2:"M2a"},
+    {n:9,quote:"「金持ちは資産を買い、貧乏人は負債を買う」",rest:"知っているようで、誰も教えてくれなかったお金の本質財務知識の有無が富の差を生む。お金の仕組みを知ることが、すべての出発点です。",link:"https://note.com/alert_hiro20/n/n7e1dfd3ef8e2",cat:"MONEY",sub:"MONEY2",sub2:""},
+    {n:10,quote:"千里の道も一歩から。",rest:"老子　大きな夢は、今日の小さな一歩が静かに積み上げている",link:"https://note.com/alert_hiro20/n/n19dbc1830402",cat:"ACTION",sub:"A1b-i",sub2:"A1b-i"},
+    {n:11,quote:"「無知の知こそが、すべての知恵の始まりである。」",rest:"ソクラテス「知らない」と気づいた日から、あなたの本当の学びが始まる",link:"https://note.com/alert_hiro20/n/nbc2e9fa3edc1",cat:"LEARNING",sub:"LEARNING3",sub2:""},
+    {n:12,quote:"「あなたの収入は、あなたが最も多く時間を過ごす5人の平均だ。」",rest:"ジム・ローン環境と人間関係が、あなたの認識の天井を決めている",link:"https://note.com/alert_hiro20/n/n110d3c6bf391",cat:"RELATION",sub:"",sub2:""},
+    {n:13,quote:"チャンスは準備された心にだけ訪れる",rest:"ルイ・パスツール　　　偶然に見えるあのチャンスは、実は「あなたの準備」が引き寄せた必然だった",link:"https://note.com/alert_hiro20/n/ndf0e3eab5060",cat:"ACTION",sub:"A1b-i",sub2:"A1b-i"},
+    {n:14,quote:"「時間はお金で買えないが、お金は時間の使い方で生まれる。」",rest:"ビジネス格言　何に時間を使うかが、あなたの収入と人生を決めている。",link:"https://note.com/alert_hiro20/n/nd064f56079b8",cat:"MONEY",sub:"MONEY1",sub2:""},
+    {n:15,quote:"読書は他人の脳を借りる行為だ。",rest:"フランシス・ベーコン 最も費用対効果の高い自己拡張の方法を、あなたはすでに知っていますか",link:"https://note.com/alert_hiro20/n/na65a7ea5e560",cat:"LEARNING",sub:"LEARNING1",sub2:""},
+    {n:16,quote:"「限界とは、あなたが自分に課したものだ。」",rest:"マイケル・ジョーダン   能力の天井は外からではなく、内側の信念が決める。",link:"https://note.com/alert_hiro20/n/n91994f6981e0",cat:"MINDSET",sub:"M1",sub2:""},
+    {n:17,quote:"失敗は転ぶことではなく、そのまま起き上がらないことだ。",rest:"メアリー・ピックフォード　転んだ回数より、立ち上がった回数が、あなたの人生をつくる。",link:"https://note.com/alert_hiro20/n/ndce92a9f1b2f",cat:"PERSIST",sub:"P1",sub2:""},
+    {n:18,quote:"今の自分を変えなければ、未来も今と同じだ。",rest:"アルベルト・アインシュタイン同じ行動を繰り返して違う結果を期待するのは、静かな自己欺瞞かもしれない。",link:"https://note.com/alert_hiro20/n/n350986ab3d22",cat:"FEAR",sub:"F1",sub2:""},
+    {n:19,quote:"「稼ぐ力より、学ぶ力を先に鍛えよ。」",rest:"ジョン・D・ロックフェラー　知識こそが、長期的な富を生み出す唯一の土台である",link:"https://note.com/alert_hiro20/n/n5608ed48e90e",cat:"LEARNING",sub:"LEARNING1",sub2:""},
+    {n:20,quote:"鏡を磨かずして、自分の顔は映らない。",rest:"江戸時代の教え　内側を磨くことで、初めて現実がクリアに見えてくる",link:"https://note.com/alert_hiro20/n/n51304811eafe",cat:"MINDSET",sub:"M1",sub2:""},
+    {n:21,quote:"「準備ができるのを待っていたら、永遠に始められない」",rest:"ジグ・ジグラーの言葉より　完璧な準備を待つことは、永遠に動かない言い訳にすぎない",link:"https://note.com/alert_hiro20/n/nb287180c8f35",cat:"ACTION",sub:"A1a",sub2:""},
+    {n:22,quote:"「人は見たいものしか見ない。」",rest:"ユリウス・カエサル　あなたの\"現実\"は、あなたの信念が作り出したフィルターかもしれない",link:"https://note.com/alert_hiro20/n/nb6d64bd5b077",cat:"MINDSET",sub:"M2b",sub2:"M2b"},
+    {n:23,quote:"木は嵐によって根を深くする。",rest:"ラテンの格言　試練から逃げなかった人だけが、本当の強さを手に入れる",link:"https://note.com/alert_hiro20/n/n73b3216eee02",cat:"PERSIST",sub:"P1",sub2:""},
+    {n:24,quote:"「完璧を待っていると、何も始まらない。」",rest:"ジョージ・パットン　準備が整ってから動くのではなく、動きながら整える。完璧主義は行動の最大の敵。",link:"https://note.com/alert_hiro20/n/n18778a18842e",cat:"ACTION",sub:"A1a",sub2:""},
+    {n:25,quote:"「あなたが問題だと思っていることが、実はあなた自身かもしれない。」",rest:"カール・ユング　外の世界に答えを探し続けても、根本は変わらない理由",link:"https://note.com/alert_hiro20/n/n00b1bfc9e9d7",cat:"MINDSET",sub:"M2a",sub2:"M2a"},
+    {n:26,quote:"「知識は力なり。しかし行動なき知識は、ただの重荷だ。」",rest:"フランシス・ベーコンの思想に基づく　学ぶだけでは、何も変わらない。知識は「使ってこそ」生きた力になる。",link:"https://note.com/alert_hiro20/n/nae81f1598769",cat:"LEARNING",sub:"LEARNING2",sub2:""},
+    {n:27,quote:"給料は生活費、副業は夢、投資は自由をもたらす。",rest:"収入の種類を増やすことで、経済的・精神的な自由度が段違いに広がる",link:"https://note.com/alert_hiro20/n/n697cb4619b73",cat:"MONEY",sub:"MONEY2",sub2:""},
+    {n:28,quote:"恥をかくことを恐れる者は、何も学べない。",rest:"ベンジャミン・フランクリン失敗を恐れる心が、あなたの成長を止めている",link:"https://note.com/alert_hiro20/n/ncd8a6eed3d76",cat:"OTHERS",sub:"",sub2:""},
+    {n:29,quote:"あなたの脳は、あなたが与えたものしか返せない。",rest:"コンピュータ科学の格言（GIGO：Garbage In, Garbage Out）あなたは今日、脳に何を与えましたか？",link:"https://note.com/alert_hiro20/n/nb8d3af4f3737",cat:"LEARNING",sub:"LEARNING1",sub2:""},
+    {n:30,quote:"今日できることを明日に延ばすな。",rest:"ベンジャミン・フランクリン　先延ばしは複利で損失を生む。小さな今日の行動が大きな明日の差をつくる。",link:"https://note.com/alert_hiro20/n/n8eaacb353204",cat:"ACTION",sub:"A1a",sub2:""},
+    {n:31,quote:"師を持つ者は10年を節約し、師を持たぬ者は10年を無駄にする。",rest:"正しいメンターを持つだけで、人生の速度は劇的に変わる。",link:"https://note.com/alert_hiro20/n/n4f7b88deff09",cat:"RELATION",sub:"",sub2:""},
+    {n:32,quote:"貧乏な人は大きなテレビを持ち、金持ちは大きな本棚を持つ。",rest:"何に時間とお金を使うかが、10年後の自分をつくる",link:"https://note.com/alert_hiro20/n/nf065b650e4ba",cat:"MONEY",sub:"MONEY3",sub2:""},
+    {n:33,quote:"蛹は蝶になるために、一度すべてを溶かす。",rest:"自然の法則 　今感じている「崩れる感覚」は、あなたが変わろうとしている証拠かもしれない。",link:"https://note.com/alert_hiro20/n/nb26d21807c0b",cat:"FEAR",sub:"F1",sub2:""},
+    {n:34,quote:"話すことは知識、聞くことは知恵。",rest:"オリバー・ウェンデル・ホームズ・シニア 「聞く力」が、あなたの認識の器を広げる",link:"https://note.com/alert_hiro20/n/n3eeadacf68c0",cat:"LEARNING",sub:"LEARNING2",sub2:""},
+    {n:35,quote:"最初の10万ドルを貯めることが、最も難しい部分だ",rest:"チャーリー・マンガー　最初の一歩が、すべての複利を生む",link:"https://note.com/alert_hiro20/n/ncea642263835",cat:"MONEY",sub:"MONEY3",sub2:""},
+    {n:36,quote:"自分を知ることが、すべての知恵の始まりだ。",rest:"アリストテレス  自己認識が正確であるほど、強みを活かし弱みを補う戦略が立てられる。",link:"https://note.com/alert_hiro20/n/n583bb2ee6d69",cat:"MINDSET",sub:"M3",sub2:""},
+    {n:37,quote:"人は変われる。ただし、変わろうとした瞬間からしか変われない。",rest:"アドラー心理学の思想より ―過去は変えられない。でも、今この瞬間の「決断」が、あなたの未来を書き換える。",link:"https://note.com/alert_hiro20/n/nc75ebb5869a1",cat:"FEAR",sub:"F1",sub2:""},
+    {n:38,quote:"幸せだから笑うのではなく、笑うから幸せになる",rest:"ウィリアム・ジェームズ　内側を変えれば、現実が変わる",link:"https://note.com/alert_hiro20/n/n53d060f37767",cat:"MINDSET",sub:"M1",sub2:""},
+    {n:39,quote:"小さなことに忠実な者は、大きなことにも忠実である。",rest:"日々の誠実さが、あなたの未来を静かに決めている  大きな成功は、見えないところでの小さな積み重ねが育てる。",link:"https://note.com/alert_hiro20/n/n31dcfe5f9a52",cat:"PERSIST",sub:"P2",sub2:""},
+    {n:40,quote:"人生は自転車に乗るようなものだ。バランスを保つには、動き続けるしかない。",rest:"止まることが、最大のリスクである",link:"https://note.com/alert_hiro20/n/nb0c7e3eb03ac",cat:"PERSIST",sub:"P2",sub2:""},
+    {n:41,quote:"魚は水の存在を知らない。人は自分の思い込みを知らない。",rest:"あなたの「当たり前」が、あなたを閉じ込めている。",link:"https://note.com/alert_hiro20/n/n8a5db2a9d9d7",cat:"MINDSET",sub:"M2b",sub2:"M2b"},
+    {n:42,quote:"時間はすべての人に平等に与えられた唯一の資産だ。",rest:"どんな才能も資本も関係ない。24時間という制約の中に、人生の答えがある。",link:"https://note.com/alert_hiro20/n/n16e6a99cd322",cat:"MONEY",sub:"MONEY1",sub2:""},
+    {n:43,quote:"転んだ回数より、立ち上がった回数の方が一つ多ければいい。",rest:"失敗の数ではなく、回復する意志が人生を前進させる",link:"https://note.com/alert_hiro20/n/ncb6435b3e8ac",cat:"PERSIST",sub:"P1",sub2:""},
+    {n:44,quote:"働いてお金を得るのではなく、お金が働くようにせよ。",rest:"ベンジャミン・フランクリン 労働収入だけに依存する構造から脱し、仕組み・資産・知識がお金を生む状態を目指す。",link:"https://note.com/alert_hiro20/n/nd2dd46d1740d",cat:"MONEY",sub:"MONEY2",sub2:""},
+    {n:45,quote:"賢者は自分の失敗から学び、さらに賢い者は他人の失敗から学ぶ。",rest:"ビスマルク　自分の経験だけを教科書にするのは非効率。読書・師・歴史から代理体験することで学習を加速できる。",link:"https://note.com/alert_hiro20/n/nb8a2d3ca1039",cat:"LEARNING",sub:"LEARNING1",sub2:""},
+    {n:46,quote:"やってみて初めて、できるかどうかわかる。",rest:"ウィリアム・フォークナー　頭の中で「できるかどうか」を考えている間は何も変わらない。行動だけが答えを教えてくれる。",link:"https://note.com/alert_hiro20/n/nb5955166aa7d",cat:"ACTION",sub:"A2",sub2:""},
+    {n:47,quote:"自分が正しいと思っている限り、成長は止まる。",rest:"チャーリー・マンガー「正しさの確信」こそが、最大の学習障壁になる。",link:"https://note.com/alert_hiro20/n/n5bba280af585",cat:"LEARNING",sub:"LEARNING3",sub2:""},
+    {n:48,quote:"今この瞬間に集中できる人が、最も遠くへ行く。",rest:"ウィリアム・ジェームズ　過去への後悔と未来への不安の間で現在を生きる。今に全力を注ぐことが最大の生産性を生む。",link:"https://note.com/alert_hiro20/n/n3e3d516e7610",cat:"ACTION",sub:"A2",sub2:""},
+    {n:49,quote:"教えることは、二度学ぶことである。",rest:"ジョゼフ・ジュベールアウトプット　（発信・教える）は最強の学習法。note記事を書くこと自体が知識を深める行為だ。",link:"https://note.com/alert_hiro20/n/n81e3f186ae79",cat:"LEARNING",sub:"LEARNING2",sub2:""},
+    {n:50,quote:"収入の10%を先に自分に払え。",rest:"ジョージ・クレイソン（バビロンの大富豪） 支出の残りを貯めるのではなく、貯蓄を先取りする。富の形成はこの小さな習慣から始まる。",link:"https://note.com/alert_hiro20/n/nc0fdfb9c96a9",cat:"MONEY",sub:"MONEY3",sub2:""},
+    {n:51,quote:"聞くは一時の恥、聞かぬは一生の恥。",rest:"日本の諺（ことわざ）　知らないことを認め、素直に聞ける人が最も早く成長する。プライドが認識の拡張を妨げる。",link:"https://note.com/alert_hiro20/n/n76f4c7c8b404",cat:"OTHERS",sub:"",sub2:""},
+    {n:52,quote:"世界はあなたが思うより広く、あなたの可能性はあなたが思うより大きい。",rest:"南アフリカの指導者ネルソン・マンデラの言葉として伝わる　自分が設定した限界は往々にして実際の限界より遥かに低い。認識を広げれば行動範囲も自然と広がる。",link:"https://note.com/alert_hiro20/n/nb618142bf290",cat:"MINDSET",sub:"M1",sub2:""},
+    {n:53,quote:"動く勇気がない人は、動かない言い訳を探す。",rest:"アリストテレス（伝）　「今は時期が悪い」「準備ができていない」はほぼ常に言い訳。勇気ある人は不完全な状況でも動き出す。",link:"https://note.com/alert_hiro20/n/n615cc4e083e4",cat:"ACTION",sub:"A1a",sub2:""},
+    {n:54,quote:"若い頃に時間を無駄にした人は、老いてからお金を無駄にする。",rest:"ベンジャミン・フランクリン　若さという最大の資産（時間・体力・回復力）を意識的に使った人が、長期的に最も豊かになる。",link:"https://note.com/alert_hiro20/n/n03a882adb8e3",cat:"MONEY",sub:"MONEY1",sub2:""},
+    {n:55,quote:"批判は成長の肥料である。",rest:"",link:"https://note.com/alert_hiro20/n/n663cdc9f00d2",cat:"OTHERS",sub:"",sub2:""},
+    {n:56,quote:"答えを知っている人より、正しい問いを立てられる人の方が価値がある。",rest:"",link:"https://note.com/alert_hiro20/n/n7b52b2d65fed",cat:"LEARNING",sub:"LEARNING2",sub2:""},
+    {n:57,quote:"貧乏人はお金のために働き、金持ちはお金を自分のために働かせる。",rest:"",link:"https://note.com/alert_hiro20/n/nbe014bb62d53",cat:"MONEY",sub:"MONEY2",sub2:""},
+    {n:58,quote:"他人と自分を比べるのをやめた時、本当の自分の人生が始まる。",rest:"",link:"https://note.com/alert_hiro20/n/n9229a01f07a7",cat:"OTHERS",sub:"",sub2:""},
+    {n:59,quote:"夢を語る人は多いが、夢に向かって歩く人は少ない。",rest:"（マーティン・ルーサー・キング）",link:"https://note.com/alert_hiro20/n/nb058fd221749",cat:"ACTION",sub:"A1b-ii",sub2:"A1b-ii"},
+    {n:60,quote:"人は死ぬまで学び続けなければならない。",rest:"なぜなら、人生は問いの連続だから。",link:"https://note.com/alert_hiro20/n/nd5c3e78d9862",cat:"LEARNING",sub:"LEARNING3",sub2:""},
+    {n:61,quote:"地図が間違っていれば、どれだけ早く走っても目的地には着かない。",rest:"",link:"https://note.com/alert_hiro20/n/nd17acea8e4cb",cat:"MINDSET",sub:"M2b",sub2:"M2b"},
+    {n:62,quote:"船は港にいる時が最も安全だ。",rest:"しかし、それが船の目的ではない。",link:"https://note.com/alert_hiro20/n/n5789d7a8df56",cat:"FEAR",sub:"F1",sub2:""},
+    {n:63,quote:"今の自分に満足した瞬間、成長は終わる。",rest:"",link:"https://note.com/alert_hiro20/n/n1d52937c7a85",cat:"FEAR",sub:"F1",sub2:""},
+    {n:64,quote:"節約は収入を増やすことと同じ価値がある。",rest:"",link:"https://note.com/alert_hiro20/n/n4b83c281b6e8",cat:"MONEY",sub:"MONEY3",sub2:""},
+    {n:65,quote:"愚か者は経験から学び、賢者は歴史から学ぶ。",rest:"",link:"https://note.com/alert_hiro20/n/n70d30f409694",cat:"LEARNING",sub:"LEARNING1",sub2:""},
+    {n:66,quote:"考えすぎる人は決して決断できない。",rest:"",link:"https://note.com/alert_hiro20/n/nc3cafb378770",cat:"ACTION",sub:"A2",sub2:""},
+    {n:67,quote:"失ったお金は取り戻せるが、失った時間は二度と戻らない。",rest:"",link:"https://note.com/alert_hiro20/n/n57f69deca5d1",cat:"MONEY",sub:"MONEY1",sub2:""},
+    {n:68,quote:"あなたが見ている世界は、あなたが選んだ言葉でできている。",rest:"",link:"https://note.com/alert_hiro20/n/n25c066fa0203",cat:"MINDSET",sub:"M2b",sub2:"M2b"},
+    {n:69,quote:"後悔するとすれば、やったことよりやらなかったことだ。",rest:"",link:"https://note.com/alert_hiro20/n/n366b7ce7bb1e",cat:"ACTION",sub:"A1b-ii",sub2:"A1b-ii"},
+    {n:70,quote:"同じ本でも、10年後に読むと違う本になる。",rest:"",link:"https://note.com/alert_hiro20/n/nee2d3405be16",cat:"LEARNING",sub:"LEARNING3",sub2:""},
+    {n:71,quote:"お金の心配をなくす最善策は、お金について学ぶことだ。",rest:"",link:"https://note.com/alert_hiro20/n/ne5f680faf688",cat:"MONEY",sub:"MONEY1",sub2:""},
+    {n:72,quote:"本当の無知は知識の欠如ではなく、学ぶことを拒む態度だ。",rest:"",link:"https://note.com/alert_hiro20/n/ne24a8cc0791d",cat:"LEARNING",sub:"LEARNING3",sub2:""},
+    {n:73,quote:"一流の人は準備に時間を使い、三流の人は言い訳に時間を使う。",rest:"",link:"https://note.com/alert_hiro20/n/n60d5ad1507ca",cat:"ACTION",sub:"A1a",sub2:""},
+    {n:74,quote:"問題の中に解決策は必ず存在する。",rest:"見つからないのは視点が足りないからだ。",link:"https://note.com/alert_hiro20/n/nbb8e6f3f4c78",cat:"MINDSET",sub:"M2a",sub2:"M2a"},
+    {n:75,quote:"批判されるのは、何かをやっている証拠だ。",rest:"",link:"https://note.com/alert_hiro20/n/n5863c98bb6e6",cat:"OTHERS",sub:"",sub2:""},
+    {n:76,quote:"急ぐことと効率的であることは、まったく別のことだ。",rest:"",link:"https://note.com/alert_hiro20/n/n743ac03f8c8e",cat:"ACTION",sub:"A2",sub2:""},
+    {n:77,quote:"人は自分が信じるものになる。",rest:"",link:"https://note.com/alert_hiro20/n/n7a7324580dfa",cat:"MINDSET",sub:"M1",sub2:""},
+    {n:78,quote:"豊かさとは持っているものの量ではなく、必要なものの少なさだ。",rest:"",link:"https://note.com/alert_hiro20/n/n89d0184b91af",cat:"MONEY",sub:"MONEY1",sub2:""},
+    {n:79,quote:"知識は借りられるが、知恵は自分で育てるしかない。",rest:"",link:"https://note.com/alert_hiro20/n/nc2e1b8aea58e",cat:"LEARNING",sub:"LEARNING2",sub2:""},
+    {n:80,quote:"最初の一歩は小さくていい。",rest:"ただし、踏み出せ。",link:"https://note.com/alert_hiro20/n/n7f0e7ad61ed3",cat:"ACTION",sub:"A1b-i",sub2:"A1b-i"},
+    {n:81,quote:"あなたの現実は、あなたの最も強い信念の反映だ。",rest:"",link:"https://note.com/alert_hiro20/n/n7315c5bfb0b1",cat:"MINDSET",sub:"M1",sub2:""},
+    {n:82,quote:"恐怖は嘘をつく。",rest:"行動だけが真実を教えてくれる。",link:"https://note.com/alert_hiro20/n/n1131f6efff22",cat:"ACTION",sub:"A1b-i",sub2:"A1b-i"},
+    {n:83,quote:"失敗しない人は、挑戦していない人だ。",rest:"",link:"https://note.com/alert_hiro20/n/n82d77a951bac",cat:"PERSIST",sub:"P1",sub2:""},
+    {n:84,quote:"毎朝、あなたは二つの選択をする。",rest:"続けるか、諦めるか。",link:"https://note.com/alert_hiro20/n/n9def4a1f3507",cat:"PERSIST",sub:"P2",sub2:""},
+    {n:85,quote:"複雑な問題にはシンプルな解がある。",rest:"それを見つけるのが知恵だ。",link:"https://note.com/alert_hiro20/n/neceda9e4e4d7",cat:"MINDSET",sub:"M2a",sub2:"M2a"},
+    {n:86,quote:"今日植えた木の陰に、明日座ることはできない。",rest:"",link:"https://note.com/alert_hiro20/n/nf7940b2e2672",cat:"PERSIST",sub:"P1",sub2:""},
+    {n:87,quote:"正しい方向への一歩は、間違った方向への千の計画に勝る。",rest:"",link:"https://note.com/alert_hiro20/n/nbd77d2ae6556",cat:"ACTION",sub:"A1b-ii",sub2:"A1b-ii"},
+    {n:88,quote:"あなたが変わらなければ、何も変わらない。",rest:"",link:"https://note.com/alert_hiro20/n/n47c142550fb6",cat:"FEAR",sub:"F1",sub2:""},
+    {n:89,quote:"嵐を恐れる船乗りは、港を離れることができない。",rest:"",link:"https://note.com/alert_hiro20/n/n9a528a9d0c18",cat:"FEAR",sub:"F1",sub2:""},
+    {n:90,quote:"比較するなら、昨日の自分とだけ比較せよ。",rest:"",link:"https://note.com/alert_hiro20/n/nf461cd207506",cat:"OTHERS",sub:"",sub2:""},
+    {n:91,quote:"答えを急ぐより、問いとともに生きることの方が豊かだ。",rest:"",link:"https://note.com/alert_hiro20/n/n80d8e26e5051",cat:"MINDSET",sub:"M2b",sub2:"M2b"},
+    {n:92,quote:"過去を引きずる者は未来へ進めず、未来を恐れる者は現在を生きられない。",rest:"",link:"https://note.com/alert_hiro20/n/n704ae0bfd256",cat:"MINDSET",sub:"M3",sub2:""},
+    {n:93,quote:"収入の大小より、収入の仕組みの方が重要だ。",rest:"",link:"https://note.com/alert_hiro20/n/nedf5a0657916",cat:"MONEY",sub:"MONEY2",sub2:""},
+    {n:94,quote:"情熱なき行動は空虚で、行動なき情熱は無力だ。",rest:"",link:"https://note.com/alert_hiro20/n/n170528c70f7e",cat:"ACTION",sub:"A2",sub2:""},
+    {n:95,quote:"人は変えられないが、人への見方は変えられる。",rest:"",link:"https://note.com/alert_hiro20/n/nadc608aebb51",cat:"RELATION",sub:"",sub2:""},
+    {n:96,quote:"完璧な準備を待っていたら、人生は終わる。",rest:"",link:"https://note.com/alert_hiro20/n/ne865fb37aaf1",cat:"ACTION",sub:"A1a",sub2:""},
+    {n:97,quote:"石の上にも三年。",rest:"しかし間違った石の上では、三十年でも無駄だ。",link:"https://note.com/alert_hiro20/n/na6f72f51bf10",cat:"PERSIST",sub:"P1",sub2:""},
+    {n:98,quote:"多くを語る者より、少なく語って深く考える者が信頼される。",rest:"",link:"https://note.com/alert_hiro20/n/n6ebe1566348a",cat:"OTHERS",sub:"",sub2:""},
+    {n:99,quote:"人生は短いが、十分に生きれば長い。",rest:"",link:"https://note.com/alert_hiro20/n/n519b8782cbc2",cat:"MINDSET",sub:"M3",sub2:""},
+    {n:100,quote:"あなたが今いる場所は終点ではない。",rest:"通過点だ。",link:"https://note.com/alert_hiro20/n/n005c69bfb18e",cat:"MINDSET",sub:"M3",sub2:""},
+    {n:101,quote:"あなたが見ている景色は、あなたが立っている場所が決める。",rest:"",link:"https://note.com/alert_hiro20/n/ne0aea4919f47",cat:"MINDSET",sub:"M2a",sub2:"M2a"},
+    {n:102,quote:"成長とは、昨日の自分が理解できなかったことが、今日わかることだ。",rest:"",link:"https://note.com/alert_hiro20/n/nb159730eda2a",cat:"LEARNING",sub:"LEARNING3",sub2:""},
+    {n:103,quote:"始めることが、完成への第一歩だ。",rest:"",link:"https://note.com/alert_hiro20/n/n596972109fc2",cat:"ACTION",sub:"A1b-i",sub2:"A1b-i"},
+    {n:104,quote:"お金は道具だ。",rest:"使う人間の器によって、善にも悪にもなる。",link:"https://note.com/alert_hiro20/n/n2e8b475f3cf3",cat:"MONEY",sub:"MONEY1",sub2:""},
+    {n:105,quote:"知識を持つ者は力を持ち、知恵を持つ者は方向を持つ。",rest:"",link:"https://note.com/alert_hiro20/n/n6d7702c9bf43",cat:"LEARNING",sub:"LEARNING2",sub2:""},
+    {n:106,quote:"勇敢とは恐れがないことではなく、恐れながらも進むことだ。",rest:"",link:"https://note.com/alert_hiro20/n/nd83c766f7f80",cat:"FEAR",sub:"F2",sub2:""},
+    {n:107,quote:"今日という日は、残りの人生の最初の日だ。",rest:"",link:"https://note.com/alert_hiro20/n/n215755e665fb",cat:"ACTION",sub:"A1b-ii",sub2:"A1b-ii"},
+    {n:108,quote:"あなたが何者かは、誰と時間を過ごすかで決まる",rest:"",link:"https://note.com/alert_hiro20/n/n60d0c6c84a7b",cat:"RELATION",sub:"",sub2:""},
+    {n:109,quote:"現実を変えたければ、まず夢を変えよ。",rest:"",link:"https://note.com/alert_hiro20/n/nf4b5c3f2c68a",cat:"MINDSET",sub:"M1",sub2:""},
+    {n:110,quote:"苦労した分だけ、人は深くなる。",rest:"",link:"https://note.com/alert_hiro20/n/n566ee326872a",cat:"PERSIST",sub:"P2",sub2:""},
+    {n:111,quote:"迷ったら、ワクワクする方を選べ。",rest:"",link:"https://note.com/alert_hiro20/n/n289fafab9fb1",cat:"MINDSET",sub:"M3",sub2:""},
+    {n:112,quote:"価値を提供する者が富を得る。",rest:"価値を奪う者は富を失う。",link:"https://note.com/alert_hiro20/n/nde2961576f2a",cat:"MONEY",sub:"MONEY2",sub2:""},
+    {n:113,quote:"沈黙は時として最も雄弁な答えだ。",rest:"",link:"https://note.com/alert_hiro20/n/n9f4ce0ef822f",cat:"OTHERS",sub:"",sub2:""},
+    {n:114,quote:"人を動かすには、論理ではなく感情に語りかけよ。",rest:"",link:"https://note.com/alert_hiro20/n/na84c0e034495",cat:"RELATION",sub:"",sub2:""},
+    {n:115,quote:"不満は変化の種、満足は停滞の土壌だ。",rest:"",link:"https://note.com/alert_hiro20/n/n24d14b8fff37",cat:"FEAR",sub:"F2",sub2:""},
+    {n:116,quote:"一時間の集中は、数日分の散漫を帳消しにできる。",rest:"",link:"https://note.com/alert_hiro20/n/ndb32567bc1d7",cat:"ACTION",sub:"A2",sub2:""},
+    {n:117,quote:"失うものを恐れる者は、得るものも失う。",rest:"",link:"https://note.com/alert_hiro20/n/nb630e76d8700",cat:"FEAR",sub:"F2",sub2:""},
+    {n:118,quote:"今日の非常識が、明日の常識になる。",rest:"",link:"https://note.com/alert_hiro20/n/n7f2232a56f55",cat:"MINDSET",sub:"M2b",sub2:"M2b"},
+    {n:119,quote:"計画は行動の召使いであり、行動は計画の主人だ。",rest:"",link:"https://note.com/alert_hiro20/n/n23e3c373615b",cat:"ACTION",sub:"A2",sub2:""},
+    {n:120,quote:"副業は第二の給料ではなく、第一の自由への道だ。",rest:"",link:"https://note.com/alert_hiro20/n/n3e4682753ba9",cat:"MONEY",sub:"MONEY2",sub2:""},
+    {n:121,quote:"正しい問いは、答えの半分だ。",rest:"",link:"https://note.com/alert_hiro20/n/nca6740a555c4",cat:"LEARNING",sub:"LEARNING2",sub2:""},
+    {n:122,quote:"批判するより、理解しようとする方が難しく、価値がある。",rest:"",link:"https://note.com/alert_hiro20/n/n1ed881446e2d",cat:"OTHERS",sub:"",sub2:""},
+    {n:123,quote:"あなたの問題の90%は、あなたの思考が作り出している。",rest:"",link:"https://note.com/alert_hiro20/n/n52d89dbc538d",cat:"MINDSET",sub:"M1",sub2:""},
+    {n:124,quote:"種を蒔かない者は、収穫を期待できない。",rest:"",link:"https://note.com/alert_hiro20/n/nb2be51b0638a",cat:"ACTION",sub:"A1a",sub2:""},
+    {n:125,quote:"やる気は行動の後からついてくる。",rest:"",link:"https://note.com/alert_hiro20/n/n3608467065e6",cat:"ACTION",sub:"A1b-ii",sub2:"A1b-ii"},
+    {n:126,quote:"老いることへの恐怖より、成長しないことへの恐怖を持て。",rest:"",link:"https://note.com/alert_hiro20/n/n17d417cc8d42",cat:"FEAR",sub:"F2",sub2:""},
+    {n:127,quote:"貧乏は運命ではなく、選択の積み重ねだ。",rest:"",link:"https://note.com/alert_hiro20/n/n8fe2e76d96c6",cat:"MONEY",sub:"MONEY3",sub2:""},
+    {n:128,quote:"平均的な人生の最大の悲劇は、挑戦しなかったことへの後悔だ。",rest:"",link:"https://note.com/alert_hiro20/n/n2e206e2a17f0",cat:"ACTION",sub:"A1b-ii",sub2:"A1b-ii"},
+    {n:129,quote:"人間の最大の欲求は、認められることだ。",rest:"",link:"https://note.com/alert_hiro20/n/n77bf5f3e094f",cat:"OTHERS",sub:"",sub2:""},
+    {n:130,quote:"思考の質が人生の質を決める。",rest:"",link:"https://note.com/alert_hiro20/n/nfc23777555de",cat:"MINDSET",sub:"M1",sub2:""},
+    {n:131,quote:"すべての専門家は、かつて初心者だった。",rest:"",link:"https://note.com/alert_hiro20/n/n59c02c62e148",cat:"LEARNING",sub:"LEARNING3",sub2:""},
+    {n:132,quote:"一度に一つのことに集中する者が、最も多くを成し遂げる。",rest:"",link:"https://note.com/alert_hiro20/n/n097dfe90548f",cat:"ACTION",sub:"A2",sub2:""},
+    {n:133,quote:"柔軟な木は嵐に折れず、硬い木は根こそぎ倒れる。",rest:"",link:"https://note.com/alert_hiro20/n/nce4c30a59daf",cat:"PERSIST",sub:"P1",sub2:""},
+    {n:134,quote:"人生で最も無駄な日は、笑わなかった日だ。",rest:"",link:"https://note.com/alert_hiro20/n/n02568fdcbdf6",cat:"MINDSET",sub:"M3",sub2:""},
+    {n:135,quote:"知識への投資は、常に最高の利回りをもたらす。",rest:"",link:"https://note.com/alert_hiro20/n/nc9964bb357e6",cat:"LEARNING",sub:"LEARNING1",sub2:""},
+    {n:136,quote:"あなたの周りの人を引き上げることが、最終的に自分を引き上げる。",rest:"",link:"https://note.com/alert_hiro20/n/n12e8fc1e263f",cat:"RELATION",sub:"",sub2:""},
+    {n:137,quote:"安定を求める者は変化を恐れ、成長を求める者は変化を歓迎する。",rest:"",link:"https://note.com/alert_hiro20/n/n975b73dc3766",cat:"FEAR",sub:"F2",sub2:""},
+    {n:138,quote:"物事をあるがままに見るのではなく、あるべき姿で見よ。",rest:"",link:"https://note.com/alert_hiro20/n/n9b2820c4e797",cat:"MINDSET",sub:"M2a",sub2:"M2a"},
+    {n:139,quote:"失敗した数だけ、選択肢が増える。",rest:"",link:"https://note.com/alert_hiro20/n/n6e22cdf5f3f7",cat:"PERSIST",sub:"P1",sub2:""},
+    {n:140,quote:"良い習慣は財産であり、悪い習慣は負債だ。",rest:"",link:"https://note.com/alert_hiro20/n/ne61bf3f68d5f",cat:"PERSIST",sub:"P2",sub2:""},
+    {n:141,quote:"なぜを5回問えば、本質にたどり着く。",rest:"",link:"https://note.com/alert_hiro20/n/nea35471183ed",cat:"LEARNING",sub:"LEARNING2",sub2:""},
+    {n:142,quote:"信頼は築くのに20年かかり、壊すのに5分で足りる。",rest:"",link:"https://note.com/alert_hiro20/n/nf19c1339bad9",cat:"RELATION",sub:"",sub2:""},
+    {n:143,quote:"今すぐできないなら、いつもできない。",rest:"",link:"https://note.com/alert_hiro20/n/n6af0c7dd8137",cat:"ACTION",sub:"A1a",sub2:""},
+    {n:144,quote:"お金は自由の道具だ。",rest:"目的にすると毒になる。",link:"https://note.com/alert_hiro20/n/n7e7cc4b6ee28",cat:"MONEY",sub:"MONEY1",sub2:""},
+    {n:145,quote:"世界は勇気ある者のためにある。",rest:"",link:"https://note.com/alert_hiro20/n/n405551841c99",cat:"FEAR",sub:"F2",sub2:""},
+    {n:146,quote:"あなたが信じていないことは、あなたには起こらない。",rest:"",link:"https://note.com/alert_hiro20/n/n090f9769a1df",cat:"MINDSET",sub:"M1",sub2:""},
+    {n:147,quote:"人生は螺旋階段だ。",rest:"同じ場所に見えても、一段高い所にいる。",link:"https://note.com/alert_hiro20/n/nfb42c78abfe4",cat:"MINDSET",sub:"M3",sub2:""},
+    {n:148,quote:"小さな行動の積み重ねが、大きな変化を生む。",rest:"",link:"https://note.com/alert_hiro20/n/nec15d4dffc86",cat:"ACTION",sub:"A2",sub2:""},
+    {n:149,quote:"本当の知恵は、自分が何を知らないかを知ることから始まる。",rest:"",link:"https://note.com/alert_hiro20/n/n487c5f014160",cat:"LEARNING",sub:"LEARNING3",sub2:""},
+    {n:150,quote:"称賛に値するのは、批評する者ではない。",rest:"実際に砂にまみれて戦う者だ。",link:"https://note.com/alert_hiro20/n/n04a66d780839",cat:"OTHERS",sub:"",sub2:""},
+  ];
+
+  // ---- decision tree: each node = {label, match, question, children:[node,...]} ----
+  // ROOT has no match/label of its own; its children are the 8 top themes.
+  var ROOT = {
+    question: "今、一番気になっているテーマはどれですか？",
+    children: [
+      { key:"ACTION",   label:"行動できない",             desc:"頭では分かっているのに、最初の一歩がいちばん重い。そんなあなたへ。",
+        match: function(it){ return it.cat==="ACTION"; },
+        question: "その中でも、近いのはどれですか？",
+        children: [
+          { key:"A1a",  label:"先延ばし・完璧主義がブレーキになっている", desc:"「準備ができたら」が、いつまでも来ない。そんなあなたへ。",
+            match: function(it){ return it.sub==="A1a"; } },
+          { key:"A1b",  label:"一歩を踏み出す勇気や、動かない後悔について", desc:"踏み出す勇気と、動かなかった後悔について。",
+            match: function(it){ return it.sub==="A1b-i" || it.sub==="A1b-ii"; },
+            question: "もう少し絞り込むと、近いのはどちらですか？",
+            children: [
+              { key:"A1b-i",  label:"最初の一歩を踏み出す勇気が欲しい", desc:"小さくていい。まずは踏み出すことについて。",
+                match: function(it){ return it.sub==="A1b-i"; } },
+              { key:"A1b-ii", label:"動かない後悔をなくしたい", desc:"やらなかったことへの後悔を減らすには。",
+                match: function(it){ return it.sub==="A1b-ii"; } }
+            ]
+          },
+          { key:"A2",   label:"始めた後の集中力・実行力について", desc:"始めた後、どう集中し、どう実行するか。",
+            match: function(it){ return it.sub==="A2"; } }
+        ]
+      },
+      { key:"PERSIST",  label:"続けられない",               desc:"始めるのは得意。問題は、そのあと。",
+        match: function(it){ return it.cat==="PERSIST"; },
+        question: "その中でも、近いのはどちらですか？",
+        children: [
+          { key:"P1", label:"失敗しても立ち上がる・折れない強さが欲しい", desc:"転んだ回数より、立ち上がった回数について。",
+            match: function(it){ return it.sub==="P1"; } },
+          { key:"P2", label:"続ける習慣・粘り強さを育てたい", desc:"続けるための、小さな習慣について。",
+            match: function(it){ return it.sub==="P2"; } }
+        ]
+      },
+      { key:"MONEY",    label:"お金が不安",                 desc:"漠然とした不安は、知識と仕組みで小さくできる。",
+        match: function(it){ return it.cat==="MONEY"; },
+        question: "その中でも、近いのはどれですか？",
+        children: [
+          { key:"MONEY1", label:"お金そのものへの向き合い方・価値観", desc:"お金との距離感、時間との関係について。",
+            match: function(it){ return it.sub==="MONEY1"; } },
+          { key:"MONEY2", label:"収入の仕組み・資産形成について", desc:"働き方・資産・仕組みについて。",
+            match: function(it){ return it.sub==="MONEY2"; } },
+          { key:"MONEY3", label:"節約・貯蓄の習慣について", desc:"小さな習慣が生む、長期的な差について。",
+            match: function(it){ return it.sub==="MONEY3"; } }
+        ]
+      },
+      { key:"LEARNING", label:"学びが結果につながらない",   desc:"インプットは十分。あとはそれをどう活かすか。",
+        match: function(it){ return it.cat==="LEARNING"; },
+        question: "その中でも、近いのはどれですか？",
+        children: [
+          { key:"LEARNING1", label:"学び方・インプットの質を見直したい", desc:"何を、どう学ぶかについて。",
+            match: function(it){ return it.sub==="LEARNING1"; } },
+          { key:"LEARNING2", label:"知識を「知恵」として活かしたい", desc:"知っていることを、使える形にするには。",
+            match: function(it){ return it.sub==="LEARNING2"; } },
+          { key:"LEARNING3", label:"謙虚さ・学び続ける姿勢を保ちたい", desc:"学び続ける人でいるための姿勢について。",
+            match: function(it){ return it.sub==="LEARNING3"; } }
+        ]
+      },
+      { key:"MINDSET",  label:"思考のクセ",                 desc:"現実は、あなたの見方ひとつで違って見えてくる。",
+        match: function(it){ return it.cat==="MINDSET"; },
+        question: "その中でも、近いのはどれですか？",
+        children: [
+          { key:"M1",  label:"思考が現実を作っている、と感じる", desc:"信念・思い込みが、見える現実を決めている。",
+            match: function(it){ return it.sub==="M1"; } },
+          { key:"M2",  label:"視点や、思い込み・言葉との付き合い方について", desc:"視点の変え方と、言葉が作る世界について。",
+            match: function(it){ return it.sub==="M2a" || it.sub==="M2b"; },
+            question: "もう少し絞り込むと、近いのはどちらですか？",
+            children: [
+              { key:"M2a", label:"視点を変えれば、答えが見えてくる", desc:"問題の中の解決策、視点の変え方について。",
+                match: function(it){ return it.sub==="M2a"; } },
+              { key:"M2b", label:"思い込みや言葉が、見える世界を決めている", desc:"当たり前だと思っていることについて。",
+                match: function(it){ return it.sub==="M2b"; } }
+            ]
+          },
+          { key:"M3",  label:"「今この瞬間」の捉え方を見直したい", desc:"今、この瞬間との付き合い方について。",
+            match: function(it){ return it.sub==="M3"; } }
+        ]
+      },
+      { key:"OTHERS",   label:"人の目が気になる",           desc:"他人の評価に振り回されがちなあなたに、少し楽になれる視点を。",
+        match: function(it){ return it.cat==="OTHERS"; } },
+      { key:"RELATION", label:"人間関係・環境",             desc:"あなたが誰と時間を過ごすかが、あなたをつくっている。",
+        match: function(it){ return it.cat==="RELATION"; } },
+      { key:"FEAR",     label:"変化が怖い",                 desc:"安定を手放す不安の先に、次の成長がある。",
+        match: function(it){ return it.cat==="FEAR"; },
+        question: "その中でも、近いのはどちらですか？",
+        children: [
+          { key:"F1", label:"変化そのものへの恐れが強い", desc:"変わることへの恐れと、その正体について。",
+            match: function(it){ return it.sub==="F1"; } },
+          { key:"F2", label:"恐れを乗り越える勇気が欲しい", desc:"恐れながらも進むための、勇気について。",
+            match: function(it){ return it.sub==="F2"; } }
+        ]
+      }
+    ]
+  };
+
+  // ---- state ----
+  // history: array of {node, candidates, breadcrumb}. current = history[history.length-1]
+  var history = [{ node: ROOT, candidates: ITEMS.slice(), crumbLabels: [] }];
+
+  var quizView = document.getElementById("quizView");
+  var checkinView = document.getElementById("checkinView");
+  var resultView = document.getElementById("resultView");
+  var qNum = document.getElementById("qNum");
+  var qText = document.getElementById("qText");
+  var choicesEl = document.getElementById("choices");
+  var breadcrumbEl = document.getElementById("breadcrumb");
+  var backRow = document.getElementById("backRow");
+  var backBtn = document.getElementById("backBtn");
+  var checkinBreadcrumb = document.getElementById("checkinBreadcrumb");
+  var checkinNum = document.getElementById("checkinNum");
+  var checkinLabel = document.getElementById("checkinLabel");
+  var checkinActions = document.getElementById("checkinActions");
+  var checkinBackBtn = document.getElementById("checkinBackBtn");
+  var topRestart = document.getElementById("topRestart");
+  var pageTitle = document.getElementById("pageTitle");
+
+  function current(){ return history[history.length - 1]; }
+
+  function renderBreadcrumb(el, crumbLabels){
+    if(crumbLabels.length === 0){ el.hidden = true; return; }
+    el.hidden = false;
+    el.innerHTML = "これまでの選択：" + crumbLabels.map(function(c){ return "<b>" + c + "</b>"; }).join(" ＞ ");
+  }
+
+  function renderQuestion(){
+    var cur = current();
+    var node = cur.node;
+    quizView.hidden = false;
+    checkinView.hidden = true;
+    resultView.hidden = true;
+    topRestart.hidden = history.length === 1;
+    backRow.hidden = history.length === 1;
+    pageTitle.hidden = history.length !== 1;
+
+    qNum.textContent = "質問 " + history.length;
+    qText.textContent = node.question;
+    renderBreadcrumb(breadcrumbEl, cur.crumbLabels);
+
+    choicesEl.innerHTML = "";
+    node.children.forEach(function(child){
+      var count = cur.candidates.filter(child.match).length;
+      var btn = document.createElement("button");
+      btn.className = "choice-btn";
+      btn.disabled = count === 0;
+      if(count === 0) btn.style.opacity = "0.4";
+      var span = document.createElement("span");
+      span.textContent = child.label;
+      var badge = document.createElement("span");
+      badge.className = "count";
+      badge.textContent = count + "件";
+      btn.appendChild(span);
+      btn.appendChild(badge);
+      btn.addEventListener("click", function(){
+        if(count === 0) return;
+        selectChild(child, count);
+      });
+      choicesEl.appendChild(btn);
+    });
+  }
+
+  function selectChild(child, count){
+    var cur = current();
+    var newCandidates = cur.candidates.filter(child.match);
+    var newCrumb = cur.crumbLabels.concat([child.label]);
+    history.push({ node: child, candidates: newCandidates, crumbLabels: newCrumb, desc: child.desc, label: child.label });
+
+    if(child.children && child.children.length){
+      renderCheckin();
+    } else {
+      showResult();
+    }
+  }
+
+  function renderCheckin(){
+    var cur = current();
+    quizView.hidden = true;
+    checkinView.hidden = false;
+    resultView.hidden = true;
+    topRestart.hidden = false;
+    pageTitle.hidden = true;
+
+    renderBreadcrumb(checkinBreadcrumb, cur.crumbLabels);
+    checkinNum.textContent = cur.candidates.length;
+    checkinLabel.innerHTML = "「<b>" + cur.label + "</b>」に近い格言は、これだけあります。";
+
+    checkinActions.innerHTML = "";
+
+    var narrowBtn = document.createElement("button");
+    narrowBtn.className = "checkin-btn primary";
+    narrowBtn.textContent = "さらに質問に答えて絞り込む";
+    narrowBtn.addEventListener("click", renderQuestion);
+    checkinActions.appendChild(narrowBtn);
+
+    var viewBtn = document.createElement("button");
+    viewBtn.className = "checkin-btn secondary";
+    viewBtn.textContent = "この" + cur.candidates.length + "件を今すぐ見る";
+    viewBtn.addEventListener("click", showResult);
+    checkinActions.appendChild(viewBtn);
+  }
+
+  function goBack(){
+    if(history.length > 1){
+      history.pop();
+    }
+    renderQuestion();
+  }
+  backBtn.addEventListener("click", goBack);
+  checkinBackBtn.addEventListener("click", goBack);
+
+  // From the result view: if the current node has its own question (we arrived
+  // here via a checkin's "see results now" button), go back to that checkin.
+  // If the current node is a plain leaf (no checkin was ever shown), pop the
+  // stack and return to the question that led here.
+  function backFromResult(){
+    var cur = current();
+    if(cur.node.children && cur.node.children.length){
+      renderCheckin();
+    } else {
+      goBack();
+    }
+  }
+
+  function showResult(){
+    var cur = current();
+    quizView.hidden = true;
+    checkinView.hidden = true;
+    resultView.hidden = false;
+    topRestart.hidden = false;
+    pageTitle.hidden = true;
+
+    document.getElementById("resultTitle").textContent = cur.label ? ("「" + cur.label + "」タイプ") : "診断結果";
+    document.getElementById("resultDesc").textContent = cur.desc || "";
+
+    var list = document.getElementById("kagenList");
+    list.innerHTML = "";
+
+    var count = document.createElement("div");
+    count.className = "result-count";
+    count.textContent = "該当する格言 " + cur.candidates.length + "件";
+    list.appendChild(count);
+
+    var sorted = cur.candidates.slice().sort(function(a,b){ return a.n - b.n; });
+    sorted.forEach(function(item){
+      var card = document.createElement("div");
+      card.className = "kagen-card";
+
+      var numEl = document.createElement("div");
+      numEl.className = "kagen-num";
+      numEl.textContent = "格言 " + String(item.n).padStart(3,"0");
+      card.appendChild(numEl);
+
+      var qEl = document.createElement("div");
+      qEl.className = "kagen-quote";
+      qEl.textContent = item.quote;
+      card.appendChild(qEl);
+
+      if(item.rest){
+        var rEl = document.createElement("div");
+        rEl.className = "kagen-rest";
+        rEl.textContent = item.rest;
+        card.appendChild(rEl);
+      }
+
+      var links = document.createElement("div");
+      links.className = "kagen-links";
+
+      var a1 = document.createElement("a");
+      a1.className = "kagen-link";
+      a1.href = item.link;
+      a1.target = "_blank";
+      a1.rel = "noopener noreferrer";
+      a1.textContent = "この格言を読む →";
+      links.appendChild(a1);
+
+      card.appendChild(links);
+      list.appendChild(card);
+    });
+  }
+
+  function restart(){
+    history = [{ node: ROOT, candidates: ITEMS.slice(), crumbLabels: [] }];
+    renderQuestion();
+  }
+
+  document.getElementById("restartBtn").addEventListener("click", restart);
+  document.getElementById("resultBackBtn").addEventListener("click", backFromResult);
+  topRestart.addEventListener("click", restart);
+
+  renderQuestion();
+})();
+</script>
